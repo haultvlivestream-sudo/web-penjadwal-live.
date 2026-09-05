@@ -3,10 +3,10 @@ const path = require('path');
 
 const app = express();
 
+// Mendukung pembacaan JSON dan Form Data dari Cron-job.org
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve tampilan utama web
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -16,7 +16,6 @@ const REPO_OWNER = 'haultvlivestream-sudo';
 const REPO_NAME = 'liveyt-denganlogo2026-amanlag';
 const WORKFLOW_FILE = 'Scriptpercobaan.yml';
 
-// Fungsi Pemicu API GitHub Actions
 async function triggerGitHub(link_youtube, kunci_rtmp, res) {
   const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${WORKFLOW_FILE}/dispatches`;
 
@@ -49,22 +48,13 @@ async function triggerGitHub(link_youtube, kunci_rtmp, res) {
   }
 }
 
-// Route POST (dari tombol web)
+// Menangani permintaan POST (dari Web & Cron-job.org)
 app.post('/api/trigger', async (req, res) => {
-  const { link_youtube, kunci_rtmp } = req.body;
+  const link_youtube = req.body.link_youtube;
+  const kunci_rtmp = req.body.kunci_rtmp;
+
   if (!link_youtube || !kunci_rtmp) {
     return res.status(400).json({ success: false, message: 'Link dan Stream Key wajib diisi!' });
-  }
-  await triggerGitHub(link_youtube, kunci_rtmp, res);
-});
-
-// Route GET (dari Cron-job.org via URL)
-app.get('/api/trigger', async (req, res) => {
-  const link_youtube = req.query.link_youtube;
-  const kunci_rtmp = req.query.kunci_rtmp;
-
-  if (!link_youtube || !kunci_rtmp) {
-    return res.status(400).json({ success: false, message: 'Parameter URL kurang!' });
   }
   await triggerGitHub(link_youtube, kunci_rtmp, res);
 });
