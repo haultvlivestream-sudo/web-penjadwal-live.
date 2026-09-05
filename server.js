@@ -2,11 +2,8 @@ const express = require('express');
 const path = require('path');
 
 const app = express();
-
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// PENTING: Menampilkan file index.html saat web dibuka
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -16,14 +13,7 @@ const REPO_OWNER = 'haultvlivestream-sudo';
 const REPO_NAME = 'liveyt-denganlogo2026-amanlag';
 const WORKFLOW_FILE = 'Scriptpercobaan.yml';
 
-// API Pintas untuk Eksekusi ke GitHub
-app.post('/api/trigger', async (req, res) => {
-  const { link_youtube, kunci_rtmp } = req.body;
-
-  if (!link_youtube || !kunci_rtmp) {
-    return res.status(400).json({ success: false, message: 'Link dan Stream Key wajib diisi!' });
-  }
-
+async function triggerGitHub(link_youtube, kunci_rtmp, res) {
   const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${WORKFLOW_FILE}/dispatches`;
 
   try {
@@ -53,6 +43,27 @@ app.post('/api/trigger', async (req, res) => {
   } catch (error) {
     return res.status(500).json({ success: false, message: 'Internal Server Error', error: error.message });
   }
+}
+
+// Mendukung POST (dari Website)
+app.post('/api/trigger', async (req, res) => {
+  const { link_youtube, kunci_rtmp } = req.body;
+  if (!link_youtube || !kunci_rtmp) {
+    return res.status(400).json({ success: false, message: 'Link dan Stream Key wajib diisi!' });
+  }
+  await triggerGitHub(link_youtube, kunci_rtmp, res);
+});
+
+// Mendukung GET (dari Cron-job.org lewat URL langsung)
+app.get('/api/trigger', async (req, res) => {
+  const link_youtube = req.query.link_youtube;
+  const kunci_rtmp = req.query.kunci_rtmp;
+
+  if (!link_youtube || !kunci_rtmp) {
+    return res.status(400).json({ success: false, message: 'Parameter URL kurang!' });
+  }
+  await triggerGitHub(link_youtube, kunci_rtmp, res);
 });
 
 module.exports = app;
+      
