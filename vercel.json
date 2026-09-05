@@ -6,10 +6,10 @@
       "use": "@vercel/node"
     }
   ],
-  "routes": [
+  "crons": [
     {
-      "src": "/(.*)",
-      "dest": "server.js"
+      "path": "/api/cron-live",
+      "schedule": "15 11 * * *"
     }
   ]
-        }
+}
