@@ -2,15 +2,21 @@ const express = require('express');
 const path = require('path');
 
 const app = express();
+
 app.use(express.json());
-app.use(express.static(__dirname));
+app.use(express.urlencoded({ extended: true }));
+
+// PENTING: Menampilkan file index.html saat web dibuka
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const REPO_OWNER = 'haultvlivestream-sudo';
 const REPO_NAME = 'liveyt-denganlogo2026-amanlag';
 const WORKFLOW_FILE = 'Scriptpercobaan.yml';
 
-// API Pintas untuk Eksekusi Langsung ke GitHub
+// API Pintas untuk Eksekusi ke GitHub
 app.post('/api/trigger', async (req, res) => {
   const { link_youtube, kunci_rtmp } = req.body;
 
