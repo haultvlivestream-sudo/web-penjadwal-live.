@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Penjadwal Live YouTube GitHub</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f4f6f9; padding: 20px; display: flex; justify-content: center; }
+    .card { background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 450px; }
+    h2 { margin-top: 0; color: #333; text-align: center; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; }
+    input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+    button { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px; }
+    button:hover { background: #218838; }
+    #status { margin-top: 15px; padding: 10px; border-radius: 5px; display: none; text-align: center; font-weight: bold; }
+    .success { background: #d4edda; color: #155724; }
+    .error { background: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>📅 Penjadwal Live WIB</h2>
+  
+  <form id="scheduleForm">
+    <div class="form-group">
+      <label>Link Video Sumber (YouTube):</label>
+      <input type="url" id="link_youtube" placeholder="https://www.youtube.com/watch?v=..." required>
+    </div>
+
+    <div class="form-group">
+      <label>Stream Key YouTube Live:</label>
+      <input type="text" id="kunci_rtmp" placeholder="xxxx-xxxx-xxxx-xxxx-xxxx" required>
+    </div>
+
+    <div class="form-group">
+      <label>Jadwal Jam Mulai (WIB):</label>
+      <input type="datetime-local" id="datetime" required>
+    </div>
+
+    <button type="submit">Set Jadwal Auto Live</button>
+  </form>
+
+  <div id="status"></div>
+</div>
+
+<script>
+  document.getElementById('scheduleForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const statusDiv = document.getElementById('status');
+    statusDiv.style.display = 'block';
+    statusDiv.className = '';
+    statusDiv.innerText = 'Menyimpan jadwal...';
+
+    const payload = {
+      link_youtube: document.getElementById('link_youtube').value,
+      kunci_rtmp: document.getElementById('kunci_rtmp').value,
+      datetime: document.getElementById('datetime').value
+    };
+
+    try {
+      const res = await fetch('/api/schedule', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        statusDiv.className = 'success';
+        statusDiv.innerText = data.message;
+        document.getElementById('scheduleForm').reset();
+      } else {
+        statusDiv.className = 'error';
+        statusDiv.innerText = data.message;
+      }
+    } catch (err) {
+      statusDiv.className = 'error';
+      statusDiv.innerText = 'Gagal menghubungi server!';
+    }
+  });
+</script>
+
+</body>
+</html>
+  
