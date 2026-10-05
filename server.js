@@ -14,7 +14,7 @@ app.get('/', (req, res) => {
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const REPO_OWNER = 'haultvlivestream-sudo';
 const REPO_NAME = 'liveyt-denganlogo2026-amanlag';
-const WORKFLOW_FILE = 'scriptkhususlivehabibomarcom.yml';
+const WORKFLOW_FILE = 'Scriptpercobaan.yml';
 
 async function triggerGitHub(link_youtube, kunci_rtmp, res) {
   const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${WORKFLOW_FILE}/dispatches`;
